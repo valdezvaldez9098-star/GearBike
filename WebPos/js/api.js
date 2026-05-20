@@ -1,6 +1,6 @@
 // Configuración de la API
 const API_CONFIG = {
-    baseUrl: 'https://TU-API.azurewebsites.net', // Cambiar por la URL de tu API
+    baseUrl: 'https://refaccionaria-api-duc5gxdmh7crhtac.eastus2-01.azurewebsites.net', // Cambiar por la URL de tu API
     endpoints: {
         login: '/api/Auth/login',
         productos: '/api/Productos',
