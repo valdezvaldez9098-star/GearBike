@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos — GearBike</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .marca-row { display:flex; gap:6px; align-items:center; }
+        .marca-row select { flex:1; }
+        .btn-icon { width:34px; height:34px; padding:0; font-size:20px; font-weight:800;
+                    border:none; border-radius:var(--radius); background:var(--orange);
+                    color:var(--white); cursor:pointer; display:flex; align-items:center;
+                    justify-content:center; flex-shrink:0; transition:var(--transition); }
+        .btn-icon:hover { background:var(--orange-hover); }
+        .mini-modal-overlay { display:none; position:fixed; inset:0;
+                              background:rgba(15,23,42,.5); z-index:2000;
+                              align-items:center; justify-content:center; }
+        .mini-modal-overlay.visible { display:flex; }
+        .mini-modal { background:var(--white); border-radius:12px; padding:26px 28px 22px;
+                      width:320px; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+        .mini-modal h3 { margin:0 0 16px; font-size:16px; font-weight:800; color:var(--navy); }
+        .mini-modal input { width:100%; padding:9px 12px; border:1.5px solid var(--gray);
+                            border-radius:var(--radius); font-size:14px; box-sizing:border-box;
+                            margin-bottom:14px; }
+        .mini-modal input:focus { outline:none; border-color:var(--orange);
+                                  box-shadow:0 0 0 3px rgba(249,115,22,.15); }
+        .mini-modal-actions { display:flex; gap:8px; justify-content:flex-end; }
+        .mini-modal-actions .btn-secondary { border-color:var(--gray); }
+    </style>
+</head>
+<body>
+<div class="app-container">
+            <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
+                <div class="sidebar-brand">Gear<span>Bike</span></div>
+                <span class="brand-sub">POS Bicicletas</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" >📊 Dashboard</a></li>
+                <li><a href="ventas.html"    >🧾 Ventas</a></li>
+                <li><a href="productos.html" class="active">📦 Productos</a></li>
+                <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
+            </ul>
+            <div class="user-info">
+                Bienvenido, <span id="userName"></span>
+            </div>
+        </nav>
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Gestión de Productos</h1>
+            <button id="btnNuevoProducto" class="btn-secondary">+ Nuevo Producto</button>
+        </header>
+        <div class="filtros-section">
+            <input type="text" id="filtroProducto" placeholder="Buscar producto...">
+            <select id="filtroMarca"><option value="">Todas las marcas</option></select>
+        </div>
+        <div class="productos-table-container">
+            <table class="data-table">
+                <thead><tr><th>ID</th><th>Nombre</th><th>Marca</th><th>Precio Venta</th><th>Stock</th><th>Acciones</th></tr></thead>
+                <tbody id="productosTable"><tr><td colspan="6">Cargando...</td></tr></tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- Modal producto -->
+<div id="productoModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Nuevo Producto</h2>
+        <form id="productoForm">
+            <input type="hidden" id="productoId">
+            <div class="form-group"><label>Nombre *</label><input type="text" id="prodNombre" required></div>
+            <div class="form-group">
+                <label>Marca *</label>
+                <div class="marca-row">
+                    <select id="prodMarca" required></select>
+                    <button type="button" class="btn-icon" id="btnNuevaMarca" title="Agregar marca">+</button>
+                </div>
+            </div>
+            <div class="form-group"><label>Tipo de Producto</label><select id="prodTipo"></select></div>
+            <div class="form-group"><label>Precio Compra</label><input type="number" id="prodPrecioCompra" step="0.01" min="0"></div>
+            <div class="form-group"><label>Precio Venta *</label><input type="number" id="prodPrecioVenta" step="0.01" min="0.01" required></div>
+            <div class="form-group"><label>Stock Actual *</label><input type="number" id="prodStockActual" min="0" required></div>
+            <div class="form-group"><label>Stock Mínimo</label><input type="number" id="prodStockMinimo" min="0"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" id="prodModelo"></div>
+            <div class="form-group"><label>Código de Barras</label><input type="text" id="prodCodigoBarras"></div>
+            <button type="submit" class="btn-primary">Guardar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Mini-modal nueva marca -->
+<div id="marcaModal" class="mini-modal-overlay">
+    <div class="mini-modal">
+        <h3>Nueva Marca</h3>
+        <input type="text" id="inputNuevaMarca" placeholder="Nombre de la marca" maxlength="80">
+        <div class="mini-modal-actions">
+            <button type="button" class="btn-secondary" id="btnCancelarMarca">Cancelar</button>
+            <button type="button" class="btn-primary" style="width:auto;padding:8px 18px" id="btnGuardarMarca">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/productos.js"></script>
+</body>
+</html>

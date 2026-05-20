@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas — GearBike</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-container">
+            <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
+                <div class="sidebar-brand">Gear<span>Bike</span></div>
+                <span class="brand-sub">POS Bicicletas</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="dashboard.html" >📊 Dashboard</a></li>
+                <li><a href="ventas.html"    class="active">🧾 Ventas</a></li>
+                <li><a href="productos.html" >📦 Productos</a></li>
+                <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
+            </ul>
+            <div class="user-info">
+                Bienvenido, <span id="userName"></span>
+            </div>
+        </nav>
+    <main class="main-content">
+        <header class="top-bar">
+            <h1>Nueva Venta</h1>
+            <div class="date-time" id="currentDateTime"></div>
+        </header>
+        <div class="ventas-layout">
+            <div class="productos-section">
+                <h2>Buscar Producto</h2>
+                <div class="search-box">
+                    <input type="text" id="searchProduct" placeholder="Buscar por nombre o código de barras...">
+                </div>
+                <div class="productos-grid" id="productosGrid">
+                    <div class="loading">Cargando productos...</div>
+                </div>
+            </div>
+            <div class="carrito-section">
+                <h2>Carrito de Compras</h2>
+                <table class="carrito-table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th><th>Cantidad</th>
+                            <th>Precio</th><th>Subtotal</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="carritoBody">
+                        <tr><td colspan="5" class="empty-carrito">Carrito vacío</td></tr>
+                    </tbody>
+                </table>
+                <div class="carrito-totales">
+                    <div class="total-line"><span>Subtotal:</span><span id="subtotal">$0.00</span></div>
+                    <div class="total-line" style="font-size:18px">
+                        <span style="font-weight:800">Total:</span>
+                        <span id="total" style="color:var(--orange)">$0.00</span>
+                    </div>
+                    <div class="pago-section">
+                        <label>Monto Recibido:</label>
+                        <input type="number" id="montoRecibido" step="0.01" value="0">
+                        <div class="cambio-line">
+                            <span>Cambio:</span>
+                            <span id="cambio">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="metodo-pago">
+                        <label>Método de Pago:</label>
+                        <select id="metodoPago">
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                    <button id="btnFinalizarVenta" class="btn-primary" style="margin-top:12px">Finalizar Venta</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ventas.js"></script>
+</body>
+</html>
