@@ -5,40 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ventas — GearBike</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ── Botón escanear ─────────────────────────────────── */
+        .search-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .search-row input {
+            flex: 1;
+            padding: 10px 13px;
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .search-row input:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(249,115,22,.15);
+        }
+        .btn-scan {
+            padding: 10px 16px;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background .2s;
+        }
+        .btn-scan:hover { background: var(--navy-hover, #2D3F57); }
+
+        /* ── Modal escáner ──────────────────────────────────── */
+        #scannerModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,.75);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+        .scanner-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.35);
+        }
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .scanner-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .scanner-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            color: #888;
+            line-height: 1;
+        }
+        .scanner-close:hover { color: var(--navy); }
+
+        #videoEscaner {
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+            display: block;
+            max-height: 300px;
+            object-fit: cover;
+        }
+        /* Marco de apuntado */
+        .scanner-viewport {
+            position: relative;
+        }
+        .scanner-viewport::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border: 2px solid var(--orange);
+            border-radius: 6px;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,.35);
+        }
+
+        #scannerEstado {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #64748b;
+            min-height: 20px;
+        }
+        #btnReintentar {
+            display: none;
+            margin: 10px auto 0;
+        }
+    </style>
 </head>
 <body>
 <div class="app-container">
-            <nav class="sidebar">
-            <div class="sidebar-header">
-                <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
-                <div class="sidebar-brand">Gear<span>Bike</span></div>
-                <span class="brand-sub">POS Bicicletas</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="dashboard.html" >📊 Dashboard</a></li>
-                <li><a href="ventas.html"    class="active">🧾 Ventas</a></li>
-                <li><a href="productos.html" >📦 Productos</a></li>
-                <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
-            </ul>
-            <div class="user-info">
-                Bienvenido, <span id="userName"></span>
-            </div>
-        </nav>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
+            <div class="sidebar-brand">Gear<span>Bike</span></div>
+            <span class="brand-sub">POS Bicicletas</span>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="ventas.html" class="active">🧾 Ventas</a></li>
+            <li><a href="productos.html">📦 Productos</a></li>
+            <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
+        </ul>
+        <div class="user-info">Bienvenido, <span id="userName"></span></div>
+    </nav>
+
     <main class="main-content">
         <header class="top-bar">
             <h1>Nueva Venta</h1>
             <div class="date-time" id="currentDateTime"></div>
         </header>
+
         <div class="ventas-layout">
+            <!-- ── Panel izquierdo: productos ── -->
             <div class="productos-section">
                 <h2>Buscar Producto</h2>
-                <div class="search-box">
-                    <input type="text" id="searchProduct" placeholder="Buscar por nombre o código de barras...">
+
+                <!-- Búsqueda + botón escanear -->
+                <div class="search-row">
+                    <input type="text" id="searchProduct"
+                           placeholder="Buscar por nombre o código de barras...">
+                    <button class="btn-scan" onclick="abrirEscaner()" title="Escanear código de barras">
+                        📷 Escanear
+                    </button>
                 </div>
+
                 <div class="productos-grid" id="productosGrid">
                     <div class="loading">Cargando productos...</div>
                 </div>
             </div>
+
+            <!-- ── Panel derecho: carrito ── -->
             <div class="carrito-section">
                 <h2>Carrito de Compras</h2>
                 <table class="carrito-table">
@@ -53,7 +172,9 @@
                     </tbody>
                 </table>
                 <div class="carrito-totales">
-                    <div class="total-line"><span>Subtotal:</span><span id="subtotal">$0.00</span></div>
+                    <div class="total-line">
+                        <span>Subtotal:</span><span id="subtotal">$0.00</span>
+                    </div>
                     <div class="total-line" style="font-size:18px">
                         <span style="font-weight:800">Total:</span>
                         <span id="total" style="color:var(--orange)">$0.00</span>
@@ -62,7 +183,7 @@
                         <label>Monto Recibido:</label>
                         <input type="number" id="montoRecibido" step="0.01" value="0">
                         <div class="cambio-line">
-                            <span>Cambio:</span>
+                            <span>Cambio: </span>
                             <span id="cambio">$0.00</span>
                         </div>
                     </div>
@@ -74,14 +195,41 @@
                             <option value="Transferencia">Transferencia</option>
                         </select>
                     </div>
-                    <button id="btnFinalizarVenta" class="btn-primary" style="margin-top:12px">Finalizar Venta</button>
+                    <button id="btnFinalizarVenta" class="btn-primary"
+                            style="margin-top:12px">Finalizar Venta</button>
                 </div>
             </div>
         </div>
     </main>
 </div>
+
+<!-- ══ Modal escáner de código de barras ══════════════════════════ -->
+<div id="scannerModal">
+    <div class="scanner-card">
+        <div class="scanner-header">
+            <h3>📷 Escanear Código de Barras</h3>
+            <button class="scanner-close" onclick="cerrarEscaner()">✕</button>
+        </div>
+
+        <div class="scanner-viewport">
+            <video id="videoEscaner" autoplay muted playsinline></video>
+        </div>
+
+        <p id="scannerEstado">Iniciando cámara...</p>
+
+        <button id="btnReintentar" class="btn-secondary"
+                style="display:none;margin:10px auto 0;display:none"
+                onclick="reintentarEscaner()">
+            🔄 Reintentar
+        </button>
+    </div>
+</div>
+
+<!-- ZXing-js desde CDN (sin instalación) -->
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/ventas.js"></script>
+<script src="js/scanner.js"></script>
 </body>
 </html>
