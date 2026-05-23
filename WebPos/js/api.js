@@ -1,13 +1,13 @@
 // Configuración de la API
 const API_CONFIG = {
-    baseUrl: 'https://refaccionaria-api-duc5gxdmh7crhtac.eastus2-01.azurewebsites.net', // Cambiar por la URL de tu API
+    baseUrl: 'https://refaccionaria-api-duc5gxdmh7crhtac.eastus2-01.azurewebsites.net',
     endpoints: {
-        login: '/api/Auth/login',
-        productos: '/api/Productos',
-        marcas: '/api/Marcas',
-        tiposProductos: '/api/TiposProductos',
-        ventas: '/api/Ventas',
-        proveedores: '/api/Proveedores'
+        login:         '/api/Auth/login',
+        productos:     '/api/Productos',
+        marcas:        '/api/Marcas',
+        tiposProductos:'/api/TiposProductos',
+        ventas:        '/api/Ventas',
+        proveedores:   '/api/Proveedores'
     }
 };
 
@@ -27,40 +27,40 @@ const ApiClient = {
                 ...options
             });
 
-            const data = await response.json();
+            // Leer el cuerpo como texto primero para evitar SyntaxError
+            // cuando la API devuelve HTML de error en lugar de JSON
+            const text = await response.text();
+
+            let data = null;
+            if (text && text.trim().length > 0) {
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    // La API devolvió algo que no es JSON (ej. error HTML de Azure)
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+                    return text;
+                }
+            }
 
             if (!response.ok) {
-                throw new Error(data.mensaje || data.message || 'Error en la petición');
+                // Extraer mensaje del JSON de error si existe
+                const msg = data?.mensaje || data?.message || data?.Mensaje
+                    || `Error ${response.status}`;
+                throw new Error(msg);
             }
 
             return data;
+
         } catch (error) {
             console.error('API Error:', error);
             throw error;
         }
     },
 
-    get(url) {
-        return this.request(url);
-    },
-
-    post(url, data) {
-        return this.request(url, {
-            method: 'POST',
-            body: JSON.stringify(data)
-        });
-    },
-
-    put(url, data) {
-        return this.request(url, {
-            method: 'PUT',
-            body: JSON.stringify(data)
-        });
-    },
-
-    delete(url) {
-        return this.request(url, {
-            method: 'DELETE'
-        });
-    }
+    get(url)         { return this.request(url); },
+    post(url, data)  { return this.request(url, { method: 'POST',   body: JSON.stringify(data) }); },
+    put(url, data)   { return this.request(url, { method: 'PUT',    body: JSON.stringify(data) }); },
+    delete(url)      { return this.request(url, { method: 'DELETE' }); }
 };
