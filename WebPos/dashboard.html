@@ -25,11 +25,22 @@
         .full-card { background:var(--white); border-radius:12px; padding:20px 22px; box-shadow:var(--shadow); }
         .full-card h2 { font-size:15px; font-weight:800; color:var(--navy);
                         margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid var(--gray); }
+
+        /* ── Dashboard responsivo ─── */
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr 1fr !important; }
+            .dash-row   { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 900px) {
+            .dash-row   { grid-template-columns: 1fr !important; }
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
-            <nav class="sidebar">
+            <button class="sidebar-toggle" aria-label="Abrir menú">&#9776;</button>
+    <div class="sidebar-overlay"></div>
+    <nav class="sidebar">
             <div class="sidebar-header">
                 <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
                 <div class="sidebar-brand">Gear<span>Bike</span></div>
@@ -63,18 +74,18 @@
             </div>
             <div class="dash-card">
                 <h2>⚠ Productos con bajo stock</h2>
-                <table class="tabla-compacta">
+                <div class="table-scroll"><table class="tabla-compacta">
                     <thead><tr><th>Nombre</th><th>Marca</th><th>Stock</th><th>Mínimo</th></tr></thead>
                     <tbody id="tablaBajoStock"><tr><td colspan="4">Cargando...</td></tr></tbody>
-                </table>
+                </table></div>
             </div>
         </div>
         <div class="full-card">
             <h2>Últimas Ventas</h2>
-            <table class="data-table">
+            <div class="table-scroll"><table class="data-table">
                 <thead><tr><th>ID Venta</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
                 <tbody id="recentSalesTable"><tr><td colspan="4">Cargando...</td></tr></tbody>
-            </table>
+            </table></div>
         </div>
     </main>
 </div>

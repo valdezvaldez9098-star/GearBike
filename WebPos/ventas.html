@@ -113,10 +113,18 @@
             display: none;
             margin: 10px auto 0;
         }
+
+        /* ── Scanner responsivo ─── */
+        @media (max-width: 640px) {
+            .scanner-card { padding: 16px 14px; }
+            #videoEscaner { max-height: 220px; }
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
+    <button class="sidebar-toggle" aria-label="Abrir menú">&#9776;</button>
+    <div class="sidebar-overlay"></div>
     <nav class="sidebar">
         <div class="sidebar-header">
             <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
@@ -160,17 +168,17 @@
             <!-- ── Panel derecho: carrito ── -->
             <div class="carrito-section">
                 <h2>Carrito de Compras</h2>
-                <table class="carrito-table">
+                <div class="table-scroll"><table class="carrito-table">
                     <thead>
                         <tr>
                             <th>Producto</th><th>Cantidad</th>
-                            <th>Precio</th><th>Subtotal</th><th></th>
+                            <th>Precio</th><th class="col-subtotal">Subtotal</th><th></th>
                         </tr>
                     </thead>
                     <tbody id="carritoBody">
                         <tr><td colspan="5" class="empty-carrito">Carrito vacío</td></tr>
                     </tbody>
-                </table>
+                </table></div>
                 <div class="carrito-totales">
                     <div class="total-line">
                         <span>Subtotal:</span><span id="subtotal">$0.00</span>

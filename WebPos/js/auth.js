@@ -46,43 +46,60 @@ const Auth = {
     updateUserInfo() {
         const user = this.getUser();
         if (user) {
-            const userNameElements = document.querySelectorAll('#userName');
-            userNameElements.forEach(el => {
+            document.querySelectorAll('#userName').forEach(el => {
                 if (el) el.textContent = user.nombreCompleto || user.nombreUsuario;
             });
         }
     }
 };
 
-// Configurar logout
+// ── Sidebar hamburger (móvil) ─────────────────────────────
+function initSidebar() {
+    const sidebar  = document.querySelector('.sidebar');
+    const overlay  = document.querySelector('.sidebar-overlay');
+    const toggle   = document.querySelector('.sidebar-toggle');
+    if (!sidebar) return;
+
+    function openSidebar()  { sidebar.classList.add('open');    overlay && overlay.classList.add('visible'); }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay && overlay.classList.remove('visible'); }
+
+    if (toggle)  toggle.addEventListener('click', openSidebar);
+    if (overlay) overlay.addEventListener('click', closeSidebar);
+
+    // Cerrar al navegar (útil en móvil)
+    sidebar.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+            if (window.innerWidth <= 640) closeSidebar();
+        });
+    });
+}
+
+// ── Inicialización ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            Auth.logout();
-        });
+        logoutBtn.addEventListener('click', e => { e.preventDefault(); Auth.logout(); });
     }
 
-    // Verificar autenticación en páginas protegidas
+    // Páginas protegidas
     if (!window.location.pathname.includes('index.html')) {
         Auth.checkAuth();
         Auth.updateUserInfo();
     }
+
+    initSidebar();
 });
 
-// Manejo del formulario de login
+// ── Formulario de login ───────────────────────────────────
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
+    loginForm.addEventListener('submit', async e => {
         e.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorDiv = document.getElementById('loginError');
-        
-        const result = await Auth.login(username, password);
-        
+        const username  = document.getElementById('username').value;
+        const password  = document.getElementById('password').value;
+        const errorDiv  = document.getElementById('loginError');
+        const result    = await Auth.login(username, password);
         if (result.success) {
             window.location.href = 'dashboard.html';
         } else {

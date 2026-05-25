@@ -27,11 +27,20 @@
                                   box-shadow:0 0 0 3px rgba(249,115,22,.15); }
         .mini-modal-actions { display:flex; gap:8px; justify-content:flex-end; }
         .mini-modal-actions .btn-secondary { border-color:var(--gray); }
+
+        /* ── Columnas opcionales en móvil ─── */
+        @media (max-width: 640px) {
+            .col-id, .col-marca { display: none; }
+            .filtros-section { flex-direction: column; }
+            #btnNuevoProducto { width: 100%; }
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
-            <nav class="sidebar">
+            <button class="sidebar-toggle" aria-label="Abrir menú">&#9776;</button>
+    <div class="sidebar-overlay"></div>
+    <nav class="sidebar">
             <div class="sidebar-header">
                 <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
                 <div class="sidebar-brand">Gear<span>Bike</span></div>
@@ -57,8 +66,8 @@
             <select id="filtroMarca"><option value="">Todas las marcas</option></select>
         </div>
         <div class="productos-table-container">
-            <table class="data-table">
-                <thead><tr><th>ID</th><th>Nombre</th><th>Marca</th><th>Precio Venta</th><th>Stock</th><th>Acciones</th></tr></thead>
+            <div class="table-scroll"><table class="data-table">
+                <thead><tr><th class="col-id">ID</th><th>Nombre</th><th class="col-marca">Marca</th><th>Precio Venta</th><th>Stock</th><th>Acciones</th></tr></thead>
                 <tbody id="productosTable"><tr><td colspan="6">Cargando...</td></tr></tbody>
             </table>
         </div>
