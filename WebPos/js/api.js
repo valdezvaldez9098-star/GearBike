@@ -7,9 +7,22 @@ const API_CONFIG = {
         marcas:        '/api/Marcas',
         tiposProductos:'/api/TiposProductos',
         ventas:        '/api/Ventas',
-        proveedores:   '/api/Proveedores'
+        proveedores:   '/api/Proveedores',
+        usuarios:      '/api/Usuarios'
     }
 };
+
+// Helper para no repetir el header X-Usuario en los módulos del admin.
+// (Auth se carga en otro script; por eso se usa dentro de la función.)
+function withAdminHeader(extraHeaders = {}) {
+    try {
+        const user = (typeof Auth !== 'undefined' && Auth && Auth.getUser) ? Auth.getUser() : null;
+        const nombreUsuario = user ? user.nombreUsuario : '';
+        return { ...extraHeaders, 'X-Usuario': nombreUsuario };
+    } catch {
+        return { ...extraHeaders, 'X-Usuario': '' };
+    }
+}
 
 // Cliente API
 const ApiClient = {

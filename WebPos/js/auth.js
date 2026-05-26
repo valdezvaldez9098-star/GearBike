@@ -74,6 +74,16 @@ function initSidebar() {
     });
 }
 
+// ── Mostrar enlace de Usuarios solo al admin ──────────────
+function initMenuAdmin() {
+    const menuUsuarios = document.getElementById('menuUsuarios');
+    if (!menuUsuarios) return;
+
+    const user = Auth.getUser();
+    const esAdmin = user && user.nombreUsuario.toLowerCase() === 'admin';
+    menuUsuarios.style.display = esAdmin ? '' : 'none';
+}
+
 // ── Inicialización ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     // Logout
@@ -86,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.location.pathname.includes('index.html')) {
         Auth.checkAuth();
         Auth.updateUserInfo();
+        initMenuAdmin();
     }
 
     initSidebar();
