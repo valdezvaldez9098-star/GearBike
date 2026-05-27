@@ -29,15 +29,20 @@ const ApiClient = {
     async request(url, options = {}) {
         const defaultOptions = {
             headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
+                'Content-Type': 'application/json'
             }
         };
 
         try {
+            // IMPORTANTE: si `options.headers` viene, no debe reemplazar todo el bloque,
+            // porque de lo contrario se pierde Content-Type y la API puede responder 415.
             const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
                 ...defaultOptions,
-                ...options
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...(options.headers || {})
+                }
             });
 
             // Leer el cuerpo como texto primero para evitar SyntaxError
