@@ -3,35 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuarios — GearBike</title>
+    <title>Clientes — GearBike</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* ── Tabla de usuarios ── */
-        .usuarios-header {
+        /* ── Encabezado del módulo ── */
+        .clientes-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
             gap: 12px;
         }
-        .usuarios-header h1 {
+        .clientes-header-left h1 {
             font-size: 22px;
             font-weight: 800;
             color: var(--navy);
+            margin: 0 0 4px;
         }
-        .tabla-usuarios-wrap {
+        .clientes-header-left span {
+            font-size: 13px;
+            color: var(--gray-mid);
+        }
+
+        /* ── Barra de búsqueda ── */
+        .barra-busqueda {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .barra-busqueda input {
+            flex: 1;
+            min-width: 220px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--gray);
+            border-radius: var(--radius);
+            font-size: 14px;
+            background: var(--white);
+            color: var(--text);
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .barra-busqueda input:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(249,115,22,.13);
+        }
+        .barra-busqueda input::placeholder { color: var(--gray-mid); }
+
+        /* ── Tabla de clientes ── */
+        .tabla-clientes-wrap {
             background: var(--white);
             border-radius: 12px;
             box-shadow: var(--shadow);
             overflow: hidden;
         }
-        .tabla-usuarios {
+        .tabla-clientes {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
         }
-        .tabla-usuarios th {
+        .tabla-clientes th {
             background: var(--navy);
             color: var(--white);
             padding: 11px 16px;
@@ -40,15 +73,20 @@
             font-weight: 700;
             letter-spacing: .4px;
         }
-        .tabla-usuarios td {
+        .tabla-clientes td {
             padding: 11px 16px;
             border-bottom: 1px solid var(--gray);
             color: var(--text);
+            vertical-align: middle;
         }
-        .tabla-usuarios tr:last-child td { border-bottom: none; }
-        .tabla-usuarios tr:hover td { background: rgba(249,115,22,.04); }
+        .tabla-clientes tr:last-child td  { border-bottom: none; }
+        .tabla-clientes tr:hover td       { background: rgba(249,115,22,.04); }
 
-        .acciones-cell { display: flex; gap: 8px; align-items: center; }
+        .acciones-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
         .btn-accion {
             width: 32px; height: 32px;
             border: none; border-radius: 8px;
@@ -56,20 +94,10 @@
             display: flex; align-items: center; justify-content: center;
             transition: var(--transition);
         }
-        .btn-editar  { background: rgba(59,130,246,.10); }
-        .btn-editar:hover  { background: rgba(59,130,246,.22); }
+        .btn-editar   { background: rgba(59,130,246,.10); }
+        .btn-editar:hover   { background: rgba(59,130,246,.22); }
         .btn-eliminar { background: rgba(239,68,68,.10); }
         .btn-eliminar:hover { background: rgba(239,68,68,.22); }
-
-        .badge-admin {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 9px;
-            border-radius: 20px;
-            background: rgba(249,115,22,.15);
-            color: var(--orange);
-            letter-spacing: .3px;
-        }
 
         /* ── Modal formulario ── */
         .modal-overlay {
@@ -81,33 +109,35 @@
             justify-content: center;
         }
         .modal-overlay.visible { display: flex; }
+
         .modal-box {
             background: var(--white);
             border-radius: 14px;
             padding: 28px 30px 24px;
-            width: 360px;
-            max-width: 94vw;
+            width: 420px;
+            max-width: 95vw;
             box-shadow: 0 20px 60px rgba(0,0,0,.22);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .modal-box h3 {
             font-size: 17px;
             font-weight: 800;
             color: var(--navy);
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
-        .modal-box .form-group {
-            margin-bottom: 14px;
-        }
+        .modal-box .form-group   { margin-bottom: 14px; }
         .modal-box label {
             display: block;
             font-size: 12px;
             font-weight: 700;
-            color: var(--navy-mid);
+            color: var(--navy-mid, #334155);
             margin-bottom: 5px;
             letter-spacing: .3px;
         }
         .modal-box input[type="text"],
-        .modal-box input[type="password"] {
+        .modal-box input[type="email"],
+        .modal-box textarea {
             width: 100%;
             padding: 9px 12px;
             border: 1.5px solid var(--gray);
@@ -117,16 +147,14 @@
             background: var(--white);
             color: var(--text);
             transition: border-color .2s, box-shadow .2s;
+            font-family: inherit;
         }
-        .modal-box input:focus {
+        .modal-box textarea { resize: vertical; min-height: 68px; }
+        .modal-box input:focus,
+        .modal-box textarea:focus {
             outline: none;
             border-color: var(--orange);
             box-shadow: 0 0 0 3px rgba(249,115,22,.15);
-        }
-        .modal-box input:disabled {
-            background: var(--gray);
-            color: var(--gray-mid);
-            cursor: not-allowed;
         }
         .modal-actions {
             display: flex;
@@ -172,11 +200,15 @@
         }
         .btn-danger:hover { background: #c53030; }
 
+        /* ── Chips de información vacía ── */
+        .text-muted { color: var(--gray-mid); font-style: italic; font-size: 13px; }
+
         /* ── Responsivo ── */
         @media (max-width: 640px) {
-            .col-id { display: none; }
-            .tabla-usuarios th:first-child,
-            .tabla-usuarios td:first-child { display: none; }
+            .col-id, .col-correo, .col-fecha { display: none; }
+        }
+        @media (max-width: 900px) {
+            .col-fecha { display: none; }
         }
     </style>
 </head>
@@ -194,8 +226,8 @@
             <li><a href="dashboard.html">📊 Dashboard</a></li>
             <li><a href="ventas.html">🧾 Ventas</a></li>
             <li><a href="productos.html">📦 Productos</a></li>
-            <li><a href="clientes.html">🧑‍🤝‍🧑 Clientes</a></li>
-            <li id="menuUsuarios"><a href="usuarios.html" class="active">👥 Usuarios</a></li>
+            <li><a href="clientes.html" class="active">🧑‍🤝‍🧑 Clientes</a></li>
+            <li id="menuUsuarios"><a href="usuarios.html">👥 Usuarios</a></li>
             <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
         </ul>
         <div class="user-info">
@@ -205,71 +237,97 @@
 
     <main class="main-content">
         <header class="top-bar">
-            <h1 class="page-title">Administración de Usuarios</h1>
+            <h1 class="page-title">Clientes</h1>
         </header>
 
-        <div class="usuarios-header">
-            <h1>Usuarios registrados</h1>
-            <button class="btn-secondary" onclick="abrirNuevo()">+ Nuevo Usuario</button>
+        <!-- Encabezado + botón nuevo -->
+        <div class="clientes-header">
+            <div class="clientes-header-left">
+                <h1>Directorio de Clientes</h1>
+                <span id="contadorClientes">0 clientes</span>
+            </div>
+            <button class="btn-secondary" onclick="abrirNuevo()">+ Nuevo Cliente</button>
         </div>
 
-        <div class="tabla-usuarios-wrap">
-            <table class="tabla-usuarios">
-                <thead>
-                    <tr>
-                        <th class="col-id">ID</th>
-                        <th>Nombre de usuario</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="usuariosTable">
-                    <tr><td colspan="3">Cargando...</td></tr>
-                </tbody>
-            </table>
+        <!-- Barra de búsqueda -->
+        <div class="barra-busqueda">
+            <input type="text" id="inputBuscar"
+                   placeholder="🔍  Buscar por nombre, teléfono o correo…">
+        </div>
+
+        <!-- Tabla -->
+        <div class="tabla-clientes-wrap">
+            <div class="table-scroll">
+                <table class="tabla-clientes">
+                    <thead>
+                        <tr>
+                            <th class="col-id">ID</th>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th class="col-correo">Correo</th>
+                            <th class="col-fecha">Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientesTable">
+                        <tr><td colspan="6" style="padding:22px;text-align:center;color:var(--gray-mid)">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 </div>
 
-<!-- ── Modal nuevo/editar usuario ── -->
-<div id="usuarioModal" class="modal-overlay">
+<!-- ── Modal nuevo/editar cliente ── -->
+<div id="clienteModal" class="modal-overlay">
     <div class="modal-box">
-        <h3 id="modalTitle">Nuevo Usuario</h3>
-        <form id="usuarioForm" autocomplete="off">
+        <h3 id="modalTitle">Nuevo Cliente</h3>
+        <form id="clienteForm" autocomplete="off">
             <div class="form-group">
-                <label for="inputNombre">Nombre de usuario *</label>
-                <input type="text" id="inputNombre" maxlength="80" autocomplete="off">
+                <label for="inputNombre">Nombre completo *</label>
+                <input type="text" id="inputNombre" maxlength="120"
+                       placeholder="Ej. Juan García Pérez">
             </div>
             <div class="form-group">
-                <label for="inputPassword" id="lblPassword">Contraseña *</label>
-                <input type="password" id="inputPassword" autocomplete="new-password">
+                <label for="inputTelefono">Teléfono</label>
+                <input type="text" id="inputTelefono" maxlength="20"
+                       placeholder="Ej. 6671234567">
             </div>
             <div class="form-group">
-                <label for="inputPassword2">Confirmar contraseña</label>
-                <input type="password" id="inputPassword2" autocomplete="new-password">
+                <label for="inputCorreo">Correo electrónico</label>
+                <input type="email" id="inputCorreo" maxlength="120"
+                       placeholder="Ej. juan@correo.com">
+            </div>
+            <div class="form-group">
+                <label for="inputDireccion">Dirección</label>
+                <textarea id="inputDireccion" maxlength="250"
+                          placeholder="Calle, colonia, ciudad…"></textarea>
             </div>
             <p class="form-error" id="formError"></p>
             <div class="modal-actions">
                 <button type="button" class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                <button type="submit" class="btn-primary" style="width:auto;padding:9px 22px;">Guardar</button>
+                <button type="submit" class="btn-primary"
+                        style="width:auto;padding:9px 24px;">Guardar</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- ── Modal confirmación eliminar ── -->
+<!-- ── Modal confirmación desactivar ── -->
 <div id="confirmModal" class="modal-overlay">
     <div class="confirm-box">
         <div class="confirm-icon">⚠️</div>
-        <p>¿Eliminar al usuario <strong id="confirmNombre"></strong>?<br>Esta acción no se puede deshacer.</p>
+        <p>¿Desactivar al cliente<br><strong id="confirmNombre"></strong>?<br>
+           <small style="color:var(--gray-mid)">El historial de ventas se conservará.</small></p>
         <div style="display:flex;gap:10px;justify-content:center">
             <button class="btn-secondary" onclick="cerrarConfirm()">Cancelar</button>
-            <button class="btn-danger" id="btnConfirmEliminar">Eliminar</button>
+            <button class="btn-danger" id="btnConfirmEliminar">Desactivar</button>
         </div>
     </div>
 </div>
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/usuarios.js"></script>
+<script src="js/clientes.js"></script>
 </body>
 </html>

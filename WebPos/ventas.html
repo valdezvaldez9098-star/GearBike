@@ -135,6 +135,7 @@
             <li><a href="dashboard.html">📊 Dashboard</a></li>
             <li><a href="ventas.html" class="active">🧾 Ventas</a></li>
             <li><a href="productos.html">📦 Productos</a></li>
+            <li><a href="clientes.html">🧑‍🤝‍🧑 Clientes</a></li>
             <li id="menuUsuarios"><a href="usuarios.html">👥 Usuarios</a></li>
             <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
         </ul>
@@ -202,6 +203,12 @@
                             <option value="Efectivo">Efectivo</option>
                             <option value="Tarjeta">Tarjeta</option>
                             <option value="Transferencia">Transferencia</option>
+                        </select>
+                    </div>
+                    <div class="metodo-pago" style="margin-top:8px">
+                        <label>Cliente:</label>
+                        <select id="selectCliente" style="flex:1">
+                            <option value="">— Venta general —</option>
                         </select>
                     </div>
                     <button id="btnFinalizarVenta" class="btn-primary"

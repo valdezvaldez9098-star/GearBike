@@ -1,6 +1,7 @@
 // ── Estado ────────────────────────────────────────────────────────────────────
-let carrito  = [];
+let carrito   = [];
 let productos = [];
+let clientes  = [];
 
 // ── Arranque ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     Auth.updateUserInfo();
     actualizarReloj();
     setInterval(actualizarReloj, 1000);
-    await cargarProductos();
+    await Promise.all([cargarProductos(), cargarClientes()]);
     setupEventListeners();
     renderCarrito();
 });
@@ -31,7 +32,25 @@ async function cargarProductos() {
     }
 }
 
-// ── Render del grid de productos ──────────────────────────────────────────────
+// ── Carga de clientes ─────────────────────────────────────────────────────────
+async function cargarClientes() {
+    try {
+        const todos = await ApiClient.get(API_CONFIG.endpoints.clientes);
+        // Solo clientes activos
+        clientes = todos.filter(c => c.activo !== false);
+        const select = document.getElementById('selectCliente');
+        if (!select) return;
+        clientes.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value       = c.idCliente;
+            opt.textContent = c.nombre + (c.telefono ? ` — ${c.telefono}` : '');
+            select.appendChild(opt);
+        });
+    } catch (e) {
+        // No crítico: si falla, la venta sigue funcionando sin cliente
+        console.warn('No se pudieron cargar los clientes:', e);
+    }
+}
 function renderGrid(lista) {
     const grid = document.getElementById('productosGrid');
     if (!grid) return;
@@ -188,6 +207,8 @@ async function finalizarVenta() {
 
     const cambio = metodoPago === 'Efectivo' ? montoRecibido - total : 0;
 
+    const clienteId = document.getElementById('selectCliente')?.value;
+
     const request = {
         venta: {
             fechaHora:       new Date().toISOString(),
@@ -196,7 +217,8 @@ async function finalizarVenta() {
             montoRecibido:   montoRecibido,
             cambioEntregado: cambio,
             metodoPago:      metodoPago,
-            estado:          true
+            estado:          true,
+            fkCliente:       clienteId ? parseInt(clienteId) : null
         },
         detalles: carrito.map(item => ({
             fkProducto:          item.idProducto,
@@ -222,6 +244,8 @@ async function finalizarVenta() {
         carrito = [];
         renderCarrito();
         document.getElementById('montoRecibido').value = 0;
+        const selCliente = document.getElementById('selectCliente');
+        if (selCliente) selCliente.value = '';
         recalcularCambio();
 
         // Recargar productos para reflejar el stock actualizado

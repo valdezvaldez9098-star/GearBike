@@ -8,12 +8,12 @@ const API_CONFIG = {
         tiposProductos:'/api/TiposProductos',
         ventas:        '/api/Ventas',
         proveedores:   '/api/Proveedores',
-        usuarios:      '/api/Usuarios'
+        usuarios:      '/api/Usuarios',
+        clientes:      '/api/Clientes'       // ← NUEVO
     }
 };
 
-// Helper para no repetir el header X-Usuario en los módulos del admin.
-// (Auth se carga en otro script; por eso se usa dentro de la función.)
+// Helper para el header X-Usuario (requerido por endpoints de admin)
 function withAdminHeader(extraHeaders = {}) {
     try {
         const user = (typeof Auth !== 'undefined' && Auth && Auth.getUser) ? Auth.getUser() : null;
@@ -34,8 +34,6 @@ const ApiClient = {
         };
 
         try {
-            // IMPORTANTE: si `options.headers` viene, no debe reemplazar todo el bloque,
-            // porque de lo contrario se pierde Content-Type y la API puede responder 415.
             const response = await fetch(`${API_CONFIG.baseUrl}${url}`, {
                 ...defaultOptions,
                 ...options,
@@ -45,8 +43,7 @@ const ApiClient = {
                 }
             });
 
-            // Leer el cuerpo como texto primero para evitar SyntaxError
-            // cuando la API devuelve HTML de error en lugar de JSON
+            // Leer como texto primero para manejar errores HTML de Azure
             const text = await response.text();
 
             let data = null;
@@ -54,7 +51,6 @@ const ApiClient = {
                 try {
                     data = JSON.parse(text);
                 } catch {
-                    // La API devolvió algo que no es JSON (ej. error HTML de Azure)
                     if (!response.ok) {
                         throw new Error(`Error ${response.status}: ${response.statusText}`);
                     }
@@ -63,7 +59,6 @@ const ApiClient = {
             }
 
             if (!response.ok) {
-                // Extraer mensaje del JSON de error si existe
                 const msg = data?.mensaje || data?.message || data?.Mensaje
                     || `Error ${response.status}`;
                 throw new Error(msg);
