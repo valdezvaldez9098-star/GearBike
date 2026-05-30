@@ -277,7 +277,7 @@ function renderTablaHistorial() {
             data-id="${v.idVenta}" title="Ver detalle">
             <td style="font-weight:700;color:var(--navy)">#${v.idVenta}</td>
             <td>${_fmtFecha(v.fechaHora)}</td>
-            <td>${escHtml(v.nombreCliente || '—')}</td>
+            <td>${escHtml(v.clienteNombre || '—')}</td>
             <td>${escHtml(v.metodoPago   || '—')}</td>
             <td style="text-align:right;font-weight:700">$${fmt(v.total)}</td>
             <td style="text-align:center">
@@ -308,7 +308,7 @@ async function mostrarPanelDetalle(idVenta, ventaBase) {
     // Llenar campos conocidos de inmediato
     _setText('detId',      `Venta #${idVenta}`);
     _setText('detFecha',   _fmtFecha(ventaBase.fechaHora || ''));
-    _setText('detCliente', ventaBase.nombreCliente || 'Venta general');
+    _setText('detCliente', ventaBase.clienteNombre || 'Venta general');
     _setText('detMetodo',  ventaBase.metodoPago    || '—');
     _setText('detTotal',   ventaBase.total != null ? `$${fmt(ventaBase.total)}` : '...');
     const estadoEl = document.getElementById('detEstado');
@@ -341,7 +341,7 @@ async function mostrarPanelDetalle(idVenta, ventaBase) {
         // Actualizar total y estado si vinieron en el detalle
         if (resp.venta) {
             _setText('detTotal',   `$${fmt(resp.venta.total)}`);
-            _setText('detCliente', resp.venta.nombreCliente || 'Venta general');
+            _setText('detCliente', resp.venta.clienteNombre || 'Venta general');
             _setText('detMetodo',  resp.venta.metodoPago    || '—');
             _setText('detFecha',   _fmtFecha(resp.venta.fechaHora || ''));
             if (estadoEl) estadoEl.innerHTML = resp.venta.estado !== false
