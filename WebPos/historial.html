@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Ventas — GearBike</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app-container">
+    <button class="sidebar-toggle" aria-label="Abrir menú">&#9776;</button>
+    <div class="sidebar-overlay"></div>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <img src="img/logo.png" alt="GearBike" class="sidebar-logo">
+            <div class="sidebar-brand">Gear<span>Bike</span></div>
+            <span class="brand-sub">POS Bicicletas</span>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="dashboard.html">📊 Dashboard</a></li>
+            <li><a href="ventas.html">🧾 Ventas</a></li>
+            <li><a href="productos.html">📦 Productos</a></li>
+            <li><a href="clientes.html">👤 Clientes</a></li>
+            <li><a href="historial.html" class="active">📋 Historial</a></li>
+            <li id="menuUsuarios" style="display:none">
+                <a href="usuarios.html">👥 Usuarios</a>
+            </li>
+            <li><a href="#" id="logoutBtn">🔓 Cerrar Sesión</a></li>
+        </ul>
+        <div class="user-info">Bienvenido, <span id="userName"></span></div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Cabecera dinámica -->
+        <div class="hist-page-header">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <h1 id="histTitulo">📋 Historial de Ventas</h1>
+                <span id="histModoBadge" class="hist-modo-badge" style="display:none"></span>
+            </div>
+            <button id="btnVolverClientes" class="btn-secondary"
+                    style="display:none" onclick="volverAClientes()">
+                ← Volver a Clientes
+            </button>
+        </div>
+
+        <!-- Resumen estadístico (solo modo cliente) -->
+        <div class="hist-resumen" id="histResumen">
+            <div class="hist-stat">
+                <span class="hs-val" id="resumenTotalVentas">—</span>
+                <span class="hs-lbl">Compras totales</span>
+            </div>
+            <div class="hist-stat">
+                <span class="hs-val" id="resumenMontoTotal">—</span>
+                <span class="hs-lbl">Total gastado</span>
+            </div>
+            <div class="hist-stat">
+                <span class="hs-val" id="resumenPromedio">—</span>
+                <span class="hs-lbl">Promedio por compra</span>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="hist-filtros">
+            <label>
+                <input type="checkbox" id="histChkFecha" style="margin-right:5px"
+                       onchange="toggleFechas()">
+                Filtrar por fecha
+            </label>
+            <label id="lblDesde" style="display:none">Desde:
+                <input type="date" id="histFechaInicio">
+            </label>
+            <label id="lblHasta" style="display:none">Hasta:
+                <input type="date" id="histFechaFin">
+            </label>
+            <button class="btn-hist-buscar" onclick="histBuscar()">🔍 Buscar</button>
+            <button class="btn-hist-limpiar" onclick="histLimpiar()">✕ Limpiar</button>
+            <span id="histLblEstado" style="font-size:12px;color:var(--text-muted);margin-left:4px"></span>
+        </div>
+
+        <!-- Tabla -->
+        <div class="full-card" style="padding:0;overflow:hidden">
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width:60px">ID</th>
+                            <th>Fecha y hora</th>
+                            <th class="col-hist-cliente">Cliente</th>
+                            <th class="col-hist-metodo">Método pago</th>
+                            <th style="text-align:right">Total</th>
+                            <th style="text-align:center;width:110px">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historialBody">
+                        <tr><td colspan="6" style="text-align:center;padding:28px;
+                            color:var(--text-muted)">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación (oculta en modo cliente) -->
+            <div class="hist-paginacion" id="histPaginacion"
+                 style="padding:12px 16px;border-top:1px solid var(--gray)">
+                <button id="histBtnAnt" onclick="histCambiarPagina(-1)" disabled>◀ Anterior</button>
+                <span id="histLblPagina">Página 1 de 1</span>
+                <button id="histBtnSig" onclick="histCambiarPagina(1)"  disabled>Siguiente ▶</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- ── Overlay + Panel detalle ── -->
+<div class="detalle-overlay" id="detalleOverlay" onclick="cerrarDetalle()"></div>
+
+<div class="detalle-panel" id="detallePanel">
+    <button class="det-cerrar" onclick="cerrarDetalle()">×</button>
+
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);
+                text-transform:uppercase;letter-spacing:.5px">Detalle de venta</div>
+    <div class="det-venta-id" id="detId"></div>
+
+    <div class="det-campo">
+        <span class="dc-lbl">Fecha</span>
+        <span class="dc-val" id="detFecha"></span>
+    </div>
+    <div class="det-campo">
+        <span class="dc-lbl">Cliente</span>
+        <span class="dc-val" id="detCliente"></span>
+    </div>
+    <div class="det-campo">
+        <span class="dc-lbl">Método de pago</span>
+        <span class="dc-val" id="detMetodo"></span>
+    </div>
+    <div class="det-campo">
+        <span class="dc-lbl">Estado</span>
+        <span class="dc-val" id="detEstado"></span>
+    </div>
+    <div class="det-total-row">
+        <span class="det-total-lbl">Total</span>
+        <span class="det-total-val" id="detTotal"></span>
+    </div>
+
+    <div class="det-productos-tit">Productos vendidos</div>
+    <div id="detCargando" style="font-size:13px;color:var(--text-muted);padding:8px 0">
+        Cargando productos...
+    </div>
+    <table id="detProductosTabla" style="display:none">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th style="text-align:center">Cant.</th>
+                <th style="text-align:right">Precio</th>
+                <th style="text-align:right">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody id="detProductosBody"></tbody>
+    </table>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/historial.js"></script>
+</body>
+</html>
