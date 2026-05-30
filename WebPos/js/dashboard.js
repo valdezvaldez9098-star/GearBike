@@ -215,41 +215,45 @@ async function cargarHistorial(resetPagina = false) {
     if (resetPagina) _historial.pagina = 1;
 
     _historial.cargando = true;
-    const tbody  = document.getElementById('historialBody');
-    const lbl    = document.getElementById('histLblEstado');
-    if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;
-        padding:20px;color:var(--text-muted)">Cargando...</td></tr>`;
+    const tbody = document.getElementById('historialBody');
+    const lbl   = document.getElementById('histLblEstado');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;' +
+        'padding:20px;color:var(--text-muted)">Cargando...</td></tr>';
 
     try {
-        const opts = {
-            pagina:    _historial.pagina,
-            porPagina: 25
-        };
+        // La API devuelve lista plana — filtramos y paginamos en cliente
+        let todas = Array.isArray(_ventas) ? [..._ventas] : [];
+        if (!todas.length) {
+            const raw = await ApiClient.get(API_CONFIG.endpoints.ventas);
+            todas = Array.isArray(raw) ? raw : (raw.ventas || []);
+        }
 
+        // Filtro por fecha opcional
         if (document.getElementById('histChkFecha')?.checked) {
             const fi = document.getElementById('histFechaInicio')?.value;
             const ff = document.getElementById('histFechaFin')?.value;
-            if (fi) opts.fechaInicio = fi;
-            if (ff) opts.fechaFin    = ff;
+            if (fi) todas = todas.filter(v => (v.fechaHora || '') >= fi);
+            if (ff) todas = todas.filter(v => (v.fechaHora || '') <= ff + 'T23:59:59');
         }
 
-        const resp = await ApiClient.getVentas(opts);
+        const porPagina = 25;
+        _historial.total        = todas.length;
+        _historial.totalPaginas = Math.max(1, Math.ceil(todas.length / porPagina));
+        _historial.pagina       = Math.min(_historial.pagina, _historial.totalPaginas);
 
-        _historial.ventas       = resp.ventas  || [];
-        _historial.total        = resp.total   || 0;
-        _historial.totalPaginas = resp.paginas || 1;
-        _historial.pagina       = resp.pagina  || 1;
+        const inicio = (_historial.pagina - 1) * porPagina;
+        _historial.ventas = todas.slice(inicio, inicio + porPagina);
 
         renderTablaHistorial();
         actualizarPaginacion();
 
-        if (lbl) lbl.textContent = `${_historial.total} venta` +
-            `${_historial.total !== 1 ? 's' : ''} encontrada` +
-            `${_historial.total !== 1 ? 's' : ''}.`;
+        if (lbl) lbl.textContent = _historial.total + ' venta' +
+            (_historial.total !== 1 ? 's' : '') + ' encontrada' +
+            (_historial.total !== 1 ? 's' : '') + '.';
 
     } catch (err) {
-        if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="color:#e74c3c;padding:14px">
-            Error: ${escHtml(err.message)}</td></tr>`;
+        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:#e74c3c;padding:14px">' +
+            'Error: ' + escHtml(err.message) + '</td></tr>';
     } finally {
         _historial.cargando = false;
     }

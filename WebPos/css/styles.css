@@ -632,66 +632,69 @@ body {
 }
 
 
-/* ════════════════════════════════════════════════════════════════════════════
-   MÓDULO CLIENTES — estilos compartidos
-   ════════════════════════════════════════════════════════════════════════════ */
-
-/* ── Encabezado del módulo ── */
-.clientes-header {
+/* ════════════════════════════════════════════════════════════════════════
+   GRÁFICA DE BARRAS — Dashboard
+   ════════════════════════════════════════════════════════════════════════ */
+.grafica-barras {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 12px;
+    gap: 6px;
+    height: 160px;
+    padding: 0 4px;
 }
-.clientes-header-left h1 {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--navy);
-    margin: 0 0 4px;
-}
-.clientes-header-left span { font-size: 13px; color: var(--gray-mid); }
-
-/* ── Barra de búsqueda ── */
-.barra-busqueda {
+.barra-col {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-}
-.barra-busqueda input {
     flex: 1;
-    min-width: 220px;
-    padding: 10px 14px;
-    border: 1.5px solid var(--gray);
-    border-radius: var(--radius);
-    font-size: 14px;
-    background: var(--white);
-    color: var(--text);
-    transition: border-color .2s, box-shadow .2s;
+    height: 100%;
+    justify-content: flex-end;
+    gap: 4px;
 }
-.barra-busqueda input:focus {
-    outline: none;
-    border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(249,115,22,.13);
+.barra-valor {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: center;
+    min-height: 14px;
+    line-height: 1;
 }
-.barra-busqueda input::placeholder { color: var(--gray-mid); }
+.barra {
+    width: 100%;
+    background: var(--orange);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height .3s ease;
+    opacity: .85;
+}
+.barra[data-hoy="true"] {
+    background: var(--navy);
+    opacity: 1;
+}
+.barra:hover { opacity: 1; }
+.barra-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    white-space: nowrap;
+}
 
-/* ── Tabla de clientes ── */
-.tabla-clientes-wrap {
+/* ════════════════════════════════════════════════════════════════════════
+   TABLA USUARIOS — estilos propios
+   ════════════════════════════════════════════════════════════════════════ */
+.tabla-usuarios-wrap {
     background: var(--white);
     border-radius: 12px;
     box-shadow: var(--shadow);
     overflow: hidden;
 }
-.tabla-clientes {
+.tabla-usuarios {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
 }
-.tabla-clientes th {
+.tabla-usuarios th {
     background: var(--navy);
     color: var(--white);
     padding: 11px 16px;
@@ -700,309 +703,34 @@ body {
     font-weight: 700;
     letter-spacing: .4px;
 }
-.tabla-clientes td {
+.tabla-usuarios td {
     padding: 11px 16px;
     border-bottom: 1px solid var(--gray);
     color: var(--text);
     vertical-align: middle;
 }
-.tabla-clientes tr:last-child td { border-bottom: none; }
-.tabla-clientes tr:hover td      { background: rgba(249,115,22,.04); }
+.tabla-usuarios tr:last-child td { border-bottom: none; }
+.tabla-usuarios tr:hover td      { background: rgba(249,115,22,.04); }
 
-/* ── Botones de acción en tabla ── */
-.acciones-cell { display: flex; gap: 8px; align-items: center; }
-.btn-accion {
-    width: 32px; height: 32px;
-    border: none; border-radius: 8px;
-    cursor: pointer; font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    transition: var(--transition);
-}
-.btn-editar           { background: rgba(59,130,246,.10); }
-.btn-editar:hover     { background: rgba(59,130,246,.22); }
-.btn-eliminar         { background: rgba(239,68,68,.10); }
-.btn-eliminar:hover   { background: rgba(239,68,68,.22); }
-.btn-historial        { background: rgba(99,102,241,.12); }
-.btn-historial:hover  { background: rgba(99,102,241,.26); }
-
-/* ── Modal genérico (clientes, usuarios) ── */
-.modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(15,23,42,.5);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-}
-.modal-overlay.visible { display: flex; }
-
-.modal-box {
-    background: var(--white);
-    border-radius: 14px;
-    padding: 28px 30px 24px;
-    width: 420px;
-    max-width: 95vw;
-    box-shadow: 0 20px 60px rgba(0,0,0,.22);
-    max-height: 90vh;
-    overflow-y: auto;
-}
-.modal-box h3 { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 20px; }
-.modal-box .form-group { margin-bottom: 14px; }
-.modal-box label {
-    display: block;
-    font-size: 12px; font-weight: 700;
-    color: var(--navy);
-    margin-bottom: 5px;
-    letter-spacing: .3px;
-}
-.modal-box input[type="text"],
-.modal-box input[type="email"],
-.modal-box input[type="password"],
-.modal-box textarea {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1.5px solid var(--gray);
-    border-radius: var(--radius);
-    font-size: 14px;
-    box-sizing: border-box;
-    background: var(--white);
-    color: var(--text);
-    transition: border-color .2s, box-shadow .2s;
-    font-family: inherit;
-}
-.modal-box textarea { resize: vertical; min-height: 68px; }
-.modal-box input:focus,
-.modal-box textarea:focus {
-    outline: none;
-    border-color: var(--orange);
-    box-shadow: 0 0 0 3px rgba(249,115,22,.15);
-}
-.modal-box input:disabled {
-    background: var(--gray);
-    color: var(--gray-mid);
-    cursor: not-allowed;
-}
-.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
-.form-error    { color: #e53e3e; font-size: 13px; margin-top: 6px; min-height: 18px; }
-
-/* Modal confirmación */
-.confirm-box {
-    background: var(--white);
-    border-radius: 14px;
-    padding: 26px 28px 22px;
-    width: 320px;
-    max-width: 94vw;
-    box-shadow: 0 20px 60px rgba(0,0,0,.22);
-    text-align: center;
-}
-.confirm-box .confirm-icon { font-size: 40px; margin-bottom: 10px; }
-.confirm-box p { font-size: 14px; color: var(--text); margin-bottom: 20px; line-height: 1.5; }
-.confirm-box strong { color: var(--navy); }
-.btn-danger {
-    padding: 9px 20px;
-    background: #e53e3e; color: #fff;
-    border: none; border-radius: var(--radius);
-    font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: background .2s;
-}
-.btn-danger:hover { background: #c53030; }
-
-/* Badge admin */
-.badge-admin {
-    font-size: 11px; font-weight: 700;
-    padding: 3px 9px; border-radius: 20px;
-    background: rgba(249,115,22,.15);
-    color: var(--orange);
-    letter-spacing: .3px;
+@media (max-width: 640px) {
+    .col-id { display: none; }
+    .tabla-usuarios th:first-child,
+    .tabla-usuarios td:first-child { display: none; }
 }
 
-/* ════════════════════════════════════════════════════════════════════════════
-   MÓDULO HISTORIAL — estilos compartidos (historial.html + dashboard.html)
-   ════════════════════════════════════════════════════════════════════════════ */
-
-/* ── Cabecera de página ── */
-.hist-page-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 18px;
-}
-.hist-page-header h1 { font-size: 22px; font-weight: 800; color: var(--navy); margin: 0; }
-
-.hist-modo-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--orange);
-    color: #fff;
-    font-size: 12px; font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 20px;
-    letter-spacing: .3px;
-}
-
-/* ── Resumen estadístico (modo cliente) ── */
-.hist-resumen {
-    display: none;
-    gap: 12px;
-    grid-template-columns: repeat(3, 1fr);
-    margin-bottom: 18px;
-}
-.hist-resumen.visible { display: grid; }
-.hist-stat {
-    background: var(--white);
-    border: 1px solid var(--gray);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    text-align: center;
-}
-.hist-stat .hs-val { font-size: 22px; font-weight: 800; color: var(--navy); display: block; }
-.hist-stat .hs-lbl {
-    font-size: 11px; color: var(--text-muted);
-    font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
-}
-
-/* ── Filtros ── */
-.hist-filtros {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    background: var(--white);
-    border: 1px solid var(--gray);
-    border-radius: var(--radius);
-    padding: 11px 16px;
-    margin-bottom: 14px;
-}
-.hist-filtros label { font-size: 13px; font-weight: 600; color: var(--navy); white-space: nowrap; }
-.hist-filtros input[type="date"] {
-    border: 1px solid var(--gray);
-    border-radius: var(--radius);
-    padding: 5px 9px;
-    font-size: 13px; color: var(--navy);
-}
-.btn-hist-buscar {
-    background: var(--orange); color: #fff;
-    border: none; border-radius: var(--radius);
-    padding: 6px 16px; font-size: 13px; font-weight: 700; cursor: pointer;
-}
-.btn-hist-buscar:hover { opacity: .88; }
-.btn-hist-limpiar {
-    background: #f3f4f6; color: var(--navy);
-    border: 1px solid var(--gray); border-radius: var(--radius);
-    padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
-}
-.btn-hist-limpiar:hover { background: #e5e7eb; }
-
-/* ── Filas de la tabla ── */
-.hist-fila { cursor: pointer; }
-.hist-fila:hover td  { background: #fff7ed !important; }
-.hist-fila-activa td { background: #fff0d9 !important; }
-
-/* ── Paginación ── */
-.hist-paginacion {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 12px; font-size: 13px; color: var(--navy);
-}
-.hist-paginacion button {
-    background: #f3f4f6;
-    border: 1px solid var(--gray); border-radius: var(--radius);
-    padding: 5px 13px; font-size: 13px; cursor: pointer;
-}
-.hist-paginacion button:disabled          { opacity: .4; cursor: default; }
-.hist-paginacion button:not(:disabled):hover { background: #e5e7eb; }
-
-/* ── Panel deslizable de detalle ── */
-.detalle-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.28);
-    z-index: 799;
-}
-.detalle-overlay.visible { display: block; }
-
-.detalle-panel {
-    display: none;
-    position: fixed; top: 0; right: 0;
-    width: 370px; height: 100vh;
-    background: var(--white);
-    border-left: 3px solid var(--orange);
-    box-shadow: -4px 0 28px rgba(0,0,0,.14);
-    z-index: 800;
-    overflow-y: auto;
-    padding: 22px 20px 30px;
-    box-sizing: border-box;
-}
-.detalle-panel.visible { display: block; }
-
-.det-cerrar {
-    position: absolute; top: 14px; right: 16px;
-    background: none; border: none;
-    font-size: 22px; cursor: pointer;
-    color: var(--text-muted); line-height: 1;
-}
-.det-cerrar:hover { color: var(--navy); }
-
-.det-venta-id { font-size: 17px; font-weight: 800; color: var(--orange); margin: 8px 0 18px; }
-
-.det-campo {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 7px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px;
-}
-.det-campo .dc-lbl { color: var(--text-muted); font-weight: 600; min-width: 110px; }
-.det-campo .dc-val { font-weight: 500; color: var(--navy); text-align: right; }
-
-.det-total-row {
-    display: flex; justify-content: space-between;
-    align-items: baseline; margin: 14px 0 6px;
-}
-.det-total-lbl { font-weight: 700; color: var(--navy); }
-.det-total-val { font-size: 22px; font-weight: 800; color: #16a34a; }
-
-.det-productos-tit {
-    font-weight: 700; color: var(--navy); font-size: 13px;
-    margin: 16px 0 8px; padding-bottom: 4px;
-    border-bottom: 2px solid var(--orange);
-}
-#detProductosTabla { width: 100%; border-collapse: collapse; font-size: 12px; }
-#detProductosTabla th {
-    background: #f1f5f9; color: var(--navy);
-    padding: 6px 7px; text-align: left; font-weight: 700;
-}
-#detProductosTabla td {
-    padding: 6px 7px; border-bottom: 1px solid #f3f4f6; color: var(--navy);
-}
-
-/* ── full-card (contenedor principal de módulos) ── */
-.full-card {
+/* ════════════════════════════════════════════════════════════════════════
+   SECCIÓN HISTORIAL en dashboard — título y contenedor
+   ════════════════════════════════════════════════════════════════════════ */
+#seccionHistorial {
     background: var(--white);
     border-radius: 12px;
     box-shadow: var(--shadow);
     padding: 20px;
-    margin-bottom: 20px;
+    margin-top: 20px;
 }
-.full-card h2 {
-    font-size: 16px; font-weight: 700;
-    color: var(--navy); margin: 0 0 16px;
-}
-
-/* ════════════════════════════════════════════════════════════════════════════
-   RESPONSIVE — historial y clientes
-   ════════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 640px) {
-    .detalle-panel           { width: 100%; }
-    .col-hist-cliente,
-    .col-hist-metodo         { display: none; }
-    .hist-resumen            { grid-template-columns: 1fr 1fr; }
-    .hist-filtros            { flex-direction: column; align-items: flex-start; }
-    .hist-filtros label      { width: 100%; }
-    .hist-filtros input[type="date"] { width: 100%; }
-    .clientes-header         { flex-direction: column; align-items: flex-start; }
-    .col-fecha, .col-correo  { display: none; }
-}
-@media (max-width: 380px) {
-    .hist-resumen            { grid-template-columns: 1fr; }
-    .hist-stat .hs-val       { font-size: 18px; }
+#seccionHistorial h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 14px;
 }
