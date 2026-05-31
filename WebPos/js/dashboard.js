@@ -22,22 +22,38 @@ function actualizarReloj() {
 async function cargarDashboard() {
     mostrarEsqueleto(true);
     try {
-        [_productos, _ventas] = await Promise.all([
+        // Llamadas independientes: si una falla no bloquea la otra
+        const [resProductos, resVentas] = await Promise.allSettled([
             ApiClient.get(API_CONFIG.endpoints.productos),
-            ApiClient.get(API_CONFIG.endpoints.ventas)      // lista simple para métricas
+            ApiClient.get(API_CONFIG.endpoints.ventas)
         ]);
+
+        if (resProductos.status === 'fulfilled') {
+            _productos = Array.isArray(resProductos.value)
+                ? resProductos.value
+                : (resProductos.value?.productos || []);
+        } else {
+            console.error('Error productos:', resProductos.reason);
+        }
+
+        if (resVentas.status === 'fulfilled') {
+            const raw = resVentas.value;
+            _ventas = Array.isArray(raw) ? raw : (raw?.ventas || []);
+        } else {
+            console.error('Error ventas:', resVentas.reason);
+            mostrarError('No se pudieron cargar las ventas: ' + resVentas.reason?.message);
+        }
+
         renderMetricas();
         renderUltimasVentas();
         renderGraficaVentas();
         renderProductosBajoStock();
     } catch (error) {
         console.error('Error cargando dashboard:', error);
-        mostrarError('No se pudo conectar con la API. Verifica que esté corriendo.');
+        mostrarError('Error inesperado: ' + (error.message || error));
     } finally {
         mostrarEsqueleto(false);
     }
-
-    // Cargar el historial de ventas en paralelo (no bloquea el dashboard)
 }
 
 // ── Tarjetas de métricas ──────────────────────────────────────────────────────
@@ -79,7 +95,7 @@ function renderUltimasVentas() {
     const tbody = document.getElementById('recentSalesTable');
     if (!tbody) return;
 
-    const ultimas = (_ventas.ventas || _ventas).slice(0, 5);
+    const ultimas = _ventas.slice(0, 5);
 
     if (!ultimas.length) {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">' +
@@ -101,7 +117,7 @@ function renderUltimasVentas() {
 
 // Abrir detalle desde la tabla de "Últimas ventas" sin necesidad de ir al historial
 async function abrirDetalleDesdeRecientes(idVenta) {
-    const ventaBase = (_ventas.ventas || _ventas).find(v => v.idVenta === idVenta) || {};
+    const ventaBase = _ventas.find(v => v.idVenta === idVenta) || {};
     await mostrarPanelDetalle(idVenta, ventaBase);
 
     // Asegurar que el historial esté visible para que el usuario no pierda contexto
@@ -121,7 +137,7 @@ function renderGraficaVentas() {
         dias.push(d.toISOString().split('T')[0]);
     }
 
-    const ventasArr = _ventas.ventas || _ventas;
+    const ventasArr = _ventas;
     const montos = dias.map(dia =>
         ventasArr
             .filter(v => (v.fechaHora || '').startsWith(dia))
