@@ -5,6 +5,10 @@ let _detalleCache = {};        // { [idVenta]: detalles[] }
 let _filaActiva   = null;
 
 // ── Arranque ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') cerrarPanelDetalle();
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!Auth.checkAuth()) return;
     Auth.updateUserInfo();
@@ -329,4 +333,17 @@ function _fmtFecha(iso) {
 
 function _fmtDateInput(d) { return d.toISOString().slice(0, 10); }
 
+// ── Utilidad ──────────────────────────────────────────────────────────────────
+function escHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
+function cerrarPanelDetalle() {
+    const panel   = document.getElementById('detallePanel');
+    const overlay = document.getElementById('detalleOverlay');
+    if (panel)   panel.classList.remove('visible');
+    if (overlay) overlay.classList.remove('visible');
+    if (_filaActiva) { _filaActiva.classList.remove('fila-activa'); _filaActiva = null; }
+}

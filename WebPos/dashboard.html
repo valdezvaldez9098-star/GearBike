@@ -102,9 +102,52 @@
         </div>
 
         <!-- ══════════════════════════════════════════════════════
-             SUB-MÓDULO: HISTORIAL DE VENTAS
-        ══════════════════════════════════════════════════════ -->
+
 </main>
+</div>
+
+<!-- ── Panel detalle de venta (Últimas Ventas) ── -->
+<div class="detalle-overlay" id="detalleOverlay" onclick="cerrarPanelDetalle()"></div>
+<div class="detalle-panel"   id="detallePanel">
+    <button class="det-cerrar" onclick="cerrarPanelDetalle()">×</button>
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);
+                text-transform:uppercase;letter-spacing:.5px">Detalle de venta</div>
+    <div class="det-venta-id" id="detId"></div>
+    <div class="det-campo">
+        <span class="dc-lbl">Fecha</span>
+        <span class="dc-val" id="detFecha"></span>
+    </div>
+    <div class="det-campo">
+        <span class="dc-lbl">Cliente</span>
+        <span class="dc-val" id="detCliente"></span>
+    </div>
+    <div class="det-campo">
+        <span class="dc-lbl">Método de pago</span>
+        <span class="dc-val" id="detMetodo"></span>
+    </div>
+    <div class="det-campo">
+        <span class="dc-lbl">Estado</span>
+        <span class="dc-val" id="detEstado"></span>
+    </div>
+    <div class="det-total-row">
+        <span class="det-total-lbl">Total</span>
+        <span class="det-total-val" id="detTotal"></span>
+    </div>
+    <div class="det-productos-tit">Productos vendidos</div>
+    <div id="detCargando" style="font-size:13px;color:var(--text-muted);padding:8px 0">
+        Cargando productos...
+    </div>
+    <table id="detProductosTabla" style="display:none">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th style="text-align:center">Cant.</th>
+                <th style="text-align:right">Precio</th>
+                <th style="text-align:right">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody id="detProductosBody"></tbody>
+    </table>
 </div>
 
 <script src="js/api.js"></script>
