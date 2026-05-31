@@ -1,13 +1,6 @@
 // ── Estado global ─────────────────────────────────────────────────────────────
 let _productos = [];
 let _ventas    = [];          // últimas ventas del dashboard
-let _historial = {            // estado del sub-módulo historial
-    ventas:        [],
-    pagina:        1,
-    totalPaginas:  1,
-    total:         0,
-    cargando:      false
-};
 let _detalleCache = {};        // { [idVenta]: detalles[] }
 let _filaActiva   = null;
 
@@ -27,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ff) ff.value = _fmtDateInput(hoy);
 
     // Habilitar/deshabilitar inputs de fecha
-    document.getElementById('histChkFecha')?.addEventListener('change', e => {
         const on = e.target.checked;
         if (fi) fi.disabled = !on;
         if (ff) ff.disabled = !on;
@@ -36,9 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (ff) ff.disabled = true;
 
     // Cerrar panel con Escape
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape') cerrarDetalle();
-    });
 
     await cargarDashboard();
 });
@@ -68,7 +57,6 @@ async function cargarDashboard() {
     }
 
     // Cargar el historial de ventas en paralelo (no bloquea el dashboard)
-    cargarHistorial();
 }
 
 // ── Tarjetas de métricas ──────────────────────────────────────────────────────
@@ -210,94 +198,10 @@ function renderProductosBajoStock() {
 // SUB-MÓDULO: HISTORIAL DE VENTAS
 // ════════════════════════════════════════════════════════════════════════════════
 
-async function cargarHistorial(resetPagina = false) {
-    if (_historial.cargando) return;
-    if (resetPagina) _historial.pagina = 1;
 
-    _historial.cargando = true;
-    const tbody = document.getElementById('historialBody');
-    const lbl   = document.getElementById('histLblEstado');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;' +
-        'padding:20px;color:var(--text-muted)">Cargando...</td></tr>';
 
-    try {
-        // La API devuelve lista plana — filtramos y paginamos en cliente
-        let todas = Array.isArray(_ventas) ? [..._ventas] : [];
-        if (!todas.length) {
-            const raw = await ApiClient.get(API_CONFIG.endpoints.ventas);
-            todas = Array.isArray(raw) ? raw : (raw.ventas || []);
-        }
 
-        // Filtro por fecha opcional
-        if (document.getElementById('histChkFecha')?.checked) {
-            const fi = document.getElementById('histFechaInicio')?.value;
-            const ff = document.getElementById('histFechaFin')?.value;
-            if (fi) todas = todas.filter(v => (v.fechaHora || '') >= fi);
-            if (ff) todas = todas.filter(v => (v.fechaHora || '') <= ff + 'T23:59:59');
-        }
 
-        const porPagina = 25;
-        _historial.total        = todas.length;
-        _historial.totalPaginas = Math.max(1, Math.ceil(todas.length / porPagina));
-        _historial.pagina       = Math.min(_historial.pagina, _historial.totalPaginas);
-
-        const inicio = (_historial.pagina - 1) * porPagina;
-        _historial.ventas = todas.slice(inicio, inicio + porPagina);
-
-        renderTablaHistorial();
-        actualizarPaginacion();
-
-        if (lbl) lbl.textContent = _historial.total + ' venta' +
-            (_historial.total !== 1 ? 's' : '') + ' encontrada' +
-            (_historial.total !== 1 ? 's' : '') + '.';
-
-    } catch (err) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="color:#e74c3c;padding:14px">' +
-            'Error: ' + escHtml(err.message) + '</td></tr>';
-    } finally {
-        _historial.cargando = false;
-    }
-}
-
-function renderTablaHistorial() {
-    const tbody = document.getElementById('historialBody');
-    if (!tbody) return;
-
-    const lista = _historial.ventas;
-    if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;
-            color:var(--text-muted)">No se encontraron ventas con los filtros aplicados.</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = lista.map(v => {
-        const completada = v.estado !== false;
-        return `
-        <tr class="hist-fila" onclick="seleccionarVenta(${v.idVenta}, this)"
-            data-id="${v.idVenta}" title="Ver detalle">
-            <td style="font-weight:700;color:var(--navy)">#${v.idVenta}</td>
-            <td>${_fmtFecha(v.fechaHora)}</td>
-            <td>${escHtml(v.clienteNombre || '—')}</td>
-            <td>${escHtml(v.metodoPago   || '—')}</td>
-            <td style="text-align:right;font-weight:700">$${fmt(v.total)}</td>
-            <td style="text-align:center">
-                <span class="status-badge ${completada ? 'active' : 'inactive'}">
-                    ${completada ? 'Completada' : 'Cancelada'}
-                </span>
-            </td>
-        </tr>`;
-    }).join('');
-}
-
-// ── Seleccionar fila del historial ────────────────────────────────────────────
-async function seleccionarVenta(idVenta, fila) {
-    if (_filaActiva) _filaActiva.classList.remove('hist-fila-activa');
-    fila.classList.add('hist-fila-activa');
-    _filaActiva = fila;
-
-    const ventaBase = _historial.ventas.find(v => v.idVenta === idVenta) || {};
-    await mostrarPanelDetalle(idVenta, ventaBase);
-}
 
 // ── Panel de detalle ──────────────────────────────────────────────────────────
 async function mostrarPanelDetalle(idVenta, ventaBase) {
@@ -379,36 +283,12 @@ function _renderDetalleProductos(detalles) {
     tablaEl.style.display = 'table';
 }
 
-function cerrarDetalle() {
-    document.getElementById('detallePanel')?.classList.remove('visible');
-    document.getElementById('detalleOverlay')?.classList.remove('visible');
-    if (_filaActiva) { _filaActiva.classList.remove('hist-fila-activa'); _filaActiva = null; }
-}
 
-// ── Paginación ────────────────────────────────────────────────────────────────
-function actualizarPaginacion() {
-    const lbl = document.getElementById('histLblPagina');
-    const ant = document.getElementById('histBtnAnt');
-    const sig = document.getElementById('histBtnSig');
-    if (lbl) lbl.textContent = `Página ${_historial.pagina} de ${_historial.totalPaginas}`;
-    if (ant) ant.disabled    = _historial.pagina <= 1;
-    if (sig) sig.disabled    = _historial.pagina >= _historial.totalPaginas;
-}
 
-function histCambiarPagina(delta) {
-    const nueva = _historial.pagina + delta;
-    if (nueva < 1 || nueva > _historial.totalPaginas) return;
-    _historial.pagina = nueva;
-    cerrarDetalle();
-    cargarHistorial();
-    document.getElementById('seccionHistorial')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
 
-function histBuscar() {
-    cerrarDetalle();
-    cargarHistorial(true);
-}
+
+
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function mostrarEsqueleto(cargando) {
@@ -452,8 +332,4 @@ function _fmtFecha(iso) {
 
 function _fmtDateInput(d) { return d.toISOString().slice(0, 10); }
 
-function escHtml(s) {
-    const d = document.createElement('div');
-    d.textContent = s || '';
-    return d.innerHTML;
-}
+
