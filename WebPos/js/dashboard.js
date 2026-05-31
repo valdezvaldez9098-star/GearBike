@@ -10,25 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     Auth.updateUserInfo();
     actualizarReloj();
     setInterval(actualizarReloj, 1000);
-
-    // Fechas por defecto en los filtros del historial: último mes
-    const hoy   = new Date();
-    const hace1m = new Date(hoy.getFullYear(), hoy.getMonth() - 1, hoy.getDate());
-    const fi = document.getElementById('histFechaInicio');
-    const ff = document.getElementById('histFechaFin');
-    if (fi) fi.value = _fmtDateInput(hace1m);
-    if (ff) ff.value = _fmtDateInput(hoy);
-
-    // Habilitar/deshabilitar inputs de fecha
-        const on = e.target.checked;
-        if (fi) fi.disabled = !on;
-        if (ff) ff.disabled = !on;
-    });
-    if (fi) fi.disabled = true;
-    if (ff) ff.disabled = true;
-
-    // Cerrar panel con Escape
-
     await cargarDashboard();
 });
 
